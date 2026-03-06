@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Water Bill</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+
+/* Remove arrows in Chrome, Safari, Edge */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove arrows in Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+body{
+font-family: Arial;
+background:#f2f2f2;
+}
+
+/* BILL SIZE A4 */
+#bill{
+width:210mm;
+min-height:0mm;
+margin:auto;
+background:white;
+border:2px solid black;
+padding:10mm;
+box-sizing:border-box;
+}
+
+.header{
+display:flex;
+align-items:center;
+border-bottom:2px solid black;
+padding-bottom:10px;
+}
+
+.logo{
+width:120px;
+}
+
+.address{
+flex:1;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+}
+
+.phone{
+font-size:18px;
+margin-top:5px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+td,th{
+border:1px solid black;
+padding:10px;
+font-size:18px;
+}
+
+.green{
+background:skyblue;
+font-weight:bold;
+}
+
+.purple{
+background:lightsteelblue;
+font-weight:bold;
+text-align:center;
+}
+
+.center{
+text-align:center;
+}
+
+.red{
+color:red;
+font-weight:bold;
+}
+
+input{
+width:100%;
+border:none;
+font-size:18px;
+text-align:center;
+}
+
+.controls{
+text-align:center;
+margin-top:20px;
+}
+
+button{
+padding:10px 20px;
+font-size:18px;
+margin:5px;
+cursor:pointer;
+}
+
+.signature{
+height:120px;
+}
+
+#bill{
+width:200mm;
+margin:auto;
+background:white;
+border:2px solid black;
+padding:10mm;
+box-sizing:border-box;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="bill">
+
+<div class="header">
+
+<div class="logo">
+
+<!-- Dummy SVG Logo -->
+<svg width="100" height="80">
+<text x="5" y="40" font-size="35" fill="black">SRS</text>
+<text x="25" y="60" font-size="15" fill="red">Enclave</text>
+</svg>
+
+</div>
+
+<div class="address">
+JR Layout
+<div class="phone">
+Ph: 9845740652
+</div>
+</div>
+
+</div>
+
+
+<table>
+
+<tr>
+<td class="green">Date</td>
+<td><input type="date" id="date"></td>
+<td class="green">Arrears / Adjustment</td>
+<td><input type="number" id="arrears" value="0"></td>
+</tr>
+
+
+<tr>
+<td class="green">House No.</td>
+<td><input type="text" id="houseNo"></td>
+<td class="green">Name</td>
+<td><input type="name" id="name"></td>
+</tr>
+
+</table>
+
+
+<table>
+
+<tr>
+<td colspan="4" class="purple">Water Bill</td>
+</tr>
+
+<tr class="purple">
+<td>Previous</td>
+<td>Current</td>
+<td>Total Lts</td>
+<td>Amount</td>
+</tr>
+
+<tr>
+<td><input type="number" id="prev"></td>
+<td><input type="number" id="current"></td>
+<td class="center" id="totalLts">0</td>
+<td class="center" id="waterAmount">0</td>
+</tr>
+
+</table>
+
+
+<table>
+
+<tr>
+<td class="green">Maintenance</td>
+<td><input type="number" id="maintenance"></td>
+<td rowspan="3" class="signature"></td>
+</tr>
+
+<tr>
+<td class="green">Rent Amount</td>
+<td><input type="number" id="rent"></td>
+</tr>
+
+<tr>
+<td class="green red">Payable Amount</td>
+<td class="center red" id="payable">0</td>
+</tr>
+
+</table>
+
+</div>
+
+
+<div class="controls">
+
+<button onclick="calculate()">Calculate</button>
+
+<button onclick="downloadPDF()">Download PDF</button>
+
+</div>
+
+
+
+<script>
+
+function calculate(){
+
+let prev=parseFloat(document.getElementById("prev").value)||0;
+let current=parseFloat(document.getElementById("current").value)||0;
+
+let arrears=parseFloat(document.getElementById("arrears").value)||0;
+let maintenance=parseFloat(document.getElementById("maintenance").value)||0;
+let rent=parseFloat(document.getElementById("rent").value)||0;
+
+let rate=1;   // water rate per litre
+
+let total=current-prev;
+
+let waterAmount=total*rate;
+
+let payable=waterAmount+arrears+maintenance+rent;
+
+document.getElementById("totalLts").innerHTML=total;
+
+document.getElementById("waterAmount").innerHTML="₹ "+waterAmount.toFixed(2);
+
+document.getElementById("payable").innerHTML="₹ "+payable.toFixed(2);
+
+}
+
+
+
+function downloadPDF(){
+
+let controls=document.querySelector(".controls");
+controls.style.display="none";
+
+const element=document.getElementById("bill");
+
+const opt={
+margin:5,   // small margin so border is not cut
+filename:'Water_Bill.pdf',
+image:{ type:'jpeg', quality:1 },
+html2canvas:{ scale:2, scrollY:0 },
+jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' },
+pagebreak:{ mode:['avoid-all','css','legacy'] }
+};
+
+html2pdf().set(opt).from(element).save().then(()=>{
+controls.style.display="block";
+});
+
+}
+
+</script>
+
+</body>
+</html>
